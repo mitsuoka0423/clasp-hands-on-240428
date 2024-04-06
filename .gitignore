@@ -6,3 +6,4 @@ dist/*.js
 # secret files
 creds.json
 .clasprc.json
+client_secret_*
