@@ -9,7 +9,7 @@ export const main = () => {
  * WebhookからのPOSTリクエストを処理する
  * @param e
  */
-export const doPost = (e: any) => {
+export const doPost = (e: GoogleAppsScript.Events.DoPost) => {
   const EVENTS = JSON.parse(e.postData.contents).events;
   for (const event of EVENTS) {
     execute(event);
