@@ -85,7 +85,7 @@ const addSheet = (message: string, date: Date, userId: string) => {
   const columnIndexMap = getColumnIndexMap(sheet);
   // 新しい行を作成して書き込む
   const newRow: Row = Array.from({ length: columnHeader.length }, () => '');
-  newRow[columnIndexMap.date] = format(date, 'MM/dd HH:mm');
+  newRow[columnIndexMap.date] = format(date, 'yyyy/MM/dd HH:mm');
   newRow[columnIndexMap.message] = message ?? '';
   newRow[columnIndexMap.user_id] = userId;
   newRow[columnIndexMap.created_at] = format(new Date(), 'yyyy/MM/dd HH:mm:ss');
