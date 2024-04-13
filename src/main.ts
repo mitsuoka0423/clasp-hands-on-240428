@@ -1,8 +1,12 @@
 import { columnHeader, getColumnIndexMap, Row } from './spreadsheet';
 import { Message, sendPushMessage, sendReplyMessage } from './line';
+import { addMinutes, format } from 'date-fns';
 
 export const main = () => {
   console.log('🐛 debug : テスト');
+  const begin = new Date();
+  const end = addMinutes(begin, 10);
+  console.log({ begin, end });
 };
 
 /**
@@ -32,6 +36,12 @@ const execute = (event: any) => {
       const matchResult = text.match(/^登録/);
       if (matchResult && matchResult.input === text) {
         add(text, REPLY_TOKEN, USER_ID);
+        sendReplyMessage(REPLY_TOKEN, [
+          {
+            type: 'text',
+            text: '登録しました',
+          },
+        ]);
       } else {
         sendError(REPLY_TOKEN);
       }
@@ -43,8 +53,8 @@ const execute = (event: any) => {
  * リマインドメッセージをスプレッドシートに登録する
  */
 const add = (text: string, replyToken: string, userId: string): void => {
-  // 登録 <日付(月/日)> <メッセージ>の形式であることを確認する
-  const reg = /^登録 (\d{1,2}\/\d{1,2}) (.+)$/;
+  // 登録 <日時(MM/dd hh:mm)> <メッセージ>の形式であることを確認する
+  const reg = /^登録 (\d{1,2}\/\d{1,2} \d{1,2}:\d{1,2}) (.+)$/;
   const validate = reg.test(text);
   if (!validate) {
     sendError(replyToken);
@@ -84,7 +94,7 @@ const sendError = (replyToken: string): void => {
   const messages = [
     {
       type: 'text',
-      text: '登録 <日付(月/日)> <メッセージ>の形式で入力してください',
+      text: '登録 <日付(月/日 時:分)> <メッセージ>の形式で入力してください',
     },
   ];
   sendReplyMessage(replyToken, messages);
@@ -105,9 +115,15 @@ export const remind = () => {
   const columnIndexMap = getColumnIndexMap(sheet);
 
   // 今日の日付を取得
-  const today = new Date();
-  const todayMonth = today.getMonth() + 1;
-  const todayDate = today.getDate();
+  const begin = new Date();
+  const end = addMinutes(begin, 10);
+
+  console.log(
+    `${format(end, 'yyyy/MM/dd HH:mm')} 〜 ${format(
+      begin,
+      'yyyy/MM/dd HH:mm'
+    )} のリマインドを送信します`
+  );
 
   // データを取得して、今日の日付のデータを抽出する
   const rows = sheet.getDataRange().getValues();
@@ -116,12 +132,9 @@ export const remind = () => {
   const userMessagesMap = rows.reduce<Record<UserId, Message[]>>(
     (acc: Record<UserId, Message[]>, row: Row) => {
       const rowDate = row[columnIndexMap.date];
-      const rowDateObj = new Date(rowDate);
+      const targetDate = new Date(rowDate);
       // 今日の日付のデータの場合、メッセージを格納する
-      if (
-        rowDateObj.getMonth() + 1 === todayMonth &&
-        rowDateObj.getDate() === todayDate
-      ) {
+      if (end <= targetDate && targetDate <= begin) {
         // 既に同じユーザーに対するメッセージの配列がある場合、メッセージを追加する
         if (acc[row[columnIndexMap.user_id]]) {
           acc[row[columnIndexMap.user_id]].push({
