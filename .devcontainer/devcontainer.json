@@ -11,9 +11,12 @@
 				"oderwat.indent-rainbow",
 				"yoshi389111.visible-whitespace",
 				"YoavBls.pretty-ts-errors",
-				"Gruntfuggly.todo-tree"
+				"Gruntfuggly.todo-tree",
+				"benjaminbenais.copilot-theme"
 			],
 			"settings": {
+				"editor.formatOnPaste": true,
+				"editor.formatOnSave": true,
 				"indentRainbow.colors": [
 					"rgba(255,255,64,0.2)",
 					"rgba(127,255,127,0.2)",
@@ -26,5 +29,9 @@
 				"visibleWhitespace.eof.color": "rgba(255, 255, 255, 0.5)"
 			}
 		}
-	}
+	},
+	"mounts": [
+		// "target=${containerWorkspaceFolder}/node_modules,type=volume",
+		"target=/workspace/node/.clasprc.json,type=volume"
+	]
 }
