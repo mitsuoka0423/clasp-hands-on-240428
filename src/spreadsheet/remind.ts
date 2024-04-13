@@ -1,5 +1,5 @@
 // データが格納されているシートのヘッダー情報
-export const columnHeader = ['date', 'message', 'user_id'] as const;
+export const columnHeader = ['date', 'message', 'user_id', 'created_at'] as const;
 type ColumnHeader = typeof columnHeader[number];
 // ヘッダーの情報と列数のマッピング
 type ColumnHeaderIndexMap = Record<ColumnHeader, number>;
@@ -29,3 +29,12 @@ export const getColumnIndexMap = (
 };
 // シート1行分の情報
 export type Row = string[];
+
+export const getSheet = (): GoogleAppsScript.Spreadsheet.Sheet => {
+  const activeSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = activeSpreadsheet.getSheetByName('remind');
+  if (!sheet) {
+    throw new Error('remind sheet not found');
+  };
+  return sheet;
+}
